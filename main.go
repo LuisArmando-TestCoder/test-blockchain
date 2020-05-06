@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	blockchain.Chain.AddBlock("You are kidding")
+	blockchain.Chain.AddBlock("Am I kidding?")
 	server.InitServer()
 }

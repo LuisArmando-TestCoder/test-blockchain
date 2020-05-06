@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"strconv"
 
 	"net/http"
 
@@ -26,12 +25,14 @@ func GetBlockchain(w http.ResponseWriter, r *http.Request) {
 	encodeResponseAsJSON(blockchain.Chain.Blocks, w)
 }
 
-func GetBlock(w http.ResponseWriter, r *http.Request) {
+func GetBlockByHash(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	blockIndex, stringConversionError := strconv.Atoi(params["id"])
-	block := blockchain.Chain.Blocks[blockIndex % len(blockchain.Chain.Blocks)]
-	if block != nil && stringConversionError == nil {
-		encodeResponseAsJSON(block, w)
+	blockHash := params["hash"]
+	for _, block := range blockchain.Chain.Blocks {
+		if (block.Hash == blockHash) {
+			encodeResponseAsJSON(block, w)
+			return
+		}
 	}
 }
 
@@ -49,7 +50,7 @@ func InitServer() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/blockchain", GetBlockchain).Methods("GET")
-	router.HandleFunc("/block/{id}", GetBlock).Methods("GET")
+	router.HandleFunc("/block/{hash}", GetBlockByHash).Methods("GET")
 	router.HandleFunc("/block", PostBlock).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":3000", router))

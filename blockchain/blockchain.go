@@ -1,28 +1,34 @@
 package blockchain
 
-import (
-	"bytes"
-	"crypto/sha256"
-)
+import "strconv"
 
 type Block struct {
-	Hash	 []byte
+	Hash	 string
 	Data	 string
-	PrevHash []byte
+	PrevHash string
 }
 
 type BlockChain struct {
 	Blocks []*Block
 }
 
-func (block *Block) InsertHash() {
-	info := bytes.Join([][]byte{[]byte(block.Data), block.PrevHash}, []byte{})
-	hash := sha256.Sum256(info)
-	block.Hash = hash[:]
+func getDataHash(data string) int {
+	var hash int
+	for i := 0; i < len(data); i++ {
+		character := int([]rune(string(data[i]))[0])
+		hash = ((hash << 5) - hash) + character
+		hash = hash & hash
+	}
+	return hash;
 }
 
-func CreateBlock(data string, prevHash []byte) *Block {
-	block := &Block{[]byte{}, data, prevHash}
+func (block *Block) InsertHash() {
+	hash := getDataHash(block.Data + block.PrevHash)
+	block.Hash = strconv.Itoa(hash)
+}
+
+func CreateBlock(data string, prevHash string) *Block {
+	block := &Block{"", data, prevHash}
 	block.InsertHash()
 	return block
 }
@@ -35,7 +41,7 @@ func (chain *BlockChain) AddBlock(data string) *Block {
 }
 
 func Genesis() *Block {
-	return CreateBlock("The life begun", []byte{})
+	return CreateBlock("The life begun", "with a click")
 }
 
 func InitBlockChain() *BlockChain {
