@@ -1,7 +1,5 @@
 package blockchain
 
-import "strconv"
-
 type Block struct {
 	Hash	 string
 	Data	 string
@@ -12,19 +10,8 @@ type BlockChain struct {
 	Blocks []*Block
 }
 
-func getDataHash(data string) int {
-	var hash int
-	for i := 0; i < len(data); i++ {
-		character := int([]rune(string(data[i]))[0])
-		hash = ((hash << 5) - hash) + character
-		hash = hash & hash
-	}
-	return hash;
-}
-
 func (block *Block) InsertHash() {
-	hash := getDataHash(block.Data + block.PrevHash)
-	block.Hash = strconv.Itoa(hash)
+	block.Hash = GetProvenHash(block)
 }
 
 func CreateBlock(data string, prevHash string) *Block {
