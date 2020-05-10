@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -11,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/luisarmando-testcoder/test-blockchain/blockchain"
+	"github.com/luisarmando-testcoder/test-blockchain/database"
 )
 
 type Block struct {
@@ -38,9 +40,14 @@ func GetBlockByHash(w http.ResponseWriter, r *http.Request) {
 
 func PostBlock(w http.ResponseWriter, r *http.Request) {
 	var data Block
-	body, _ := ioutil.ReadAll(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
 
-	json.Unmarshal(body, &data)
+	database.Handle(err)
+
+	unmarshalErr := json.Unmarshal(body, &data)
+
+	database.Handle(unmarshalErr)
+	
 	newBlock := blockchain.Chain.AddBlock(data.Data)
 
 	encodeResponseAsJSON(newBlock, w)
@@ -52,6 +59,14 @@ func InitServer() {
 	router.HandleFunc("/blockchain", GetBlockchain).Methods("GET")
 	router.HandleFunc("/block/{hash}", GetBlockByHash).Methods("GET")
 	router.HandleFunc("/block", PostBlock).Methods("POST")
+
+	database.OpenDatabase()
+	defer database.DB.Close()
+
+	blockchain.Chain.AddBlock("Am I kidding?")
+	database.InsertStartingBlockchainIfNeeded()
+
+	fmt.Println(database.GetLastHash())
 
 	log.Fatal(http.ListenAndServe(":3000", router))
 }
