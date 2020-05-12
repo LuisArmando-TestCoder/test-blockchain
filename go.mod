@@ -1,8 +1,8 @@
 module github.com/luisarmando-testcoder/test-blockchain
 
+go 1.14
+
 require (
 	github.com/gorilla/mux v1.7.4
-	rsc.io/quote v1.5.2
+	github.com/syndtr/goleveldb v1.0.0
 )
-
-go 1.14

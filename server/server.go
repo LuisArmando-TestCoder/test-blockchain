@@ -22,26 +22,30 @@ func encodeResponseAsJSON(data interface{}, w io.Writer) {
 }
 
 func GetBlockchain(w http.ResponseWriter, r *http.Request) {
-	encodeResponseAsJSON(blockchain.Chain.Blocks, w)
+	DBBlockchain := blockchain.RetrieveBlockchain()
+	encodeResponseAsJSON(DBBlockchain, w)
 }
 
 func GetBlockByHash(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	blockHash := params["hash"]
-	for _, block := range blockchain.Chain.Blocks {
-		if (block.Hash == blockHash) {
-			encodeResponseAsJSON(block, w)
-			return
-		}
-	}
+	block := blockchain.RetrieveBlock(blockHash)
+	encodeResponseAsJSON(block, w)
 }
 
 func PostBlock(w http.ResponseWriter, r *http.Request) {
 	var data Block
-	body, _ := ioutil.ReadAll(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
 
-	json.Unmarshal(body, &data)
+	blockchain.Handle(err)
+
+	unmarshalErr := json.Unmarshal(body, &data)
+
+	blockchain.Handle(unmarshalErr)
+
 	newBlock := blockchain.Chain.AddBlock(data.Data)
+
+	blockchain.InsertBlock(newBlock)
 
 	encodeResponseAsJSON(newBlock, w)
 }
@@ -52,6 +56,11 @@ func InitServer() {
 	router.HandleFunc("/blockchain", GetBlockchain).Methods("GET")
 	router.HandleFunc("/block/{hash}", GetBlockByHash).Methods("GET")
 	router.HandleFunc("/block", PostBlock).Methods("POST")
+
+	blockchain.OpenDatabase()
+
+	blockchain.Chain.AddBlock("Am I kidding?")
+	blockchain.InsertStartingBlockchainIfNeeded()
 
 	log.Fatal(http.ListenAndServe(":3000", router))
 }
