@@ -1,14 +1,12 @@
-package database
+package blockchain
 
 import (
 	"bytes"
 	"encoding/gob"
 	"log"
-
-	"github.com/luisarmando-testcoder/test-blockchain/blockchain"
 )
 
-func Serialize(block *blockchain.Block) []byte {
+func Serialize(block *Block) []byte {
 	var res bytes.Buffer
 	encoder := gob.NewEncoder(&res)
 
@@ -19,8 +17,8 @@ func Serialize(block *blockchain.Block) []byte {
 	return res.Bytes()
 }
 
-func Deserialize(data []byte) *blockchain.Block {
-	var block blockchain.Block
+func Deserialize(data []byte) *Block {
+	var block Block
 
 	decoder := gob.NewDecoder(bytes.NewReader(data))
 
