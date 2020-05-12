@@ -2,6 +2,7 @@ package blockchain
 
 import "github.com/syndtr/goleveldb/leveldb"
 
+
 const dbPath = "./tmp/level"
 
 var DB *leveldb.DB
@@ -14,16 +15,16 @@ func OpenDatabase() {
 	DB = db
 }
 
-func RetrieveBlockchain() []*Block {
-	var tempBlockchain []*Block
+func RetrieveBlockchain() []Block {
+	var tempBlockchain []Block
 
 	iter := DB.NewIterator(nil, nil)
 
 	for iter.Next() {
 		value := Deserialize(iter.Value())
-		tempBlockchain = append(tempBlockchain, value)
+		
+		tempBlockchain = append(tempBlockchain, *value)
 	}
-
 	iter.Release()
 	err := iter.Error()
 

@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -62,8 +61,6 @@ func InitServer() {
 
 	blockchain.Chain.AddBlock("Am I kidding?")
 	blockchain.InsertStartingBlockchainIfNeeded()
-
-	fmt.Println(blockchain.RetrieveBlockchain())
 
 	log.Fatal(http.ListenAndServe(":3000", router))
 }

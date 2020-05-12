@@ -22,7 +22,7 @@ func Deserialize(data []byte) *Block {
 
 	decoder := gob.NewDecoder(bytes.NewReader(data))
 
-	err := decoder.Decode(block)
+	err := decoder.Decode(&block)
 
 	Handle(err)
 
