@@ -43,7 +43,7 @@ func PostBlock(w http.ResponseWriter, r *http.Request) {
 	unmarshalErr := json.Unmarshal(body, &data)
 
 	blockchain.Handle(unmarshalErr)
-	
+
 	newBlock := blockchain.Chain.AddBlock(data.Data)
 
 	blockchain.InsertBlock(newBlock)

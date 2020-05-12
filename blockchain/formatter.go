@@ -3,7 +3,7 @@ package blockchain
 import (
 	"bytes"
 	"encoding/gob"
-	"log"
+	"fmt"
 )
 
 func Serialize(block *Block) []byte {
@@ -18,7 +18,7 @@ func Serialize(block *Block) []byte {
 }
 
 func Deserialize(data []byte) *Block {
-	var block Block
+	var block *Block
 
 	decoder := gob.NewDecoder(bytes.NewReader(data))
 
@@ -26,11 +26,11 @@ func Deserialize(data []byte) *Block {
 
 	Handle(err)
 
-	return &block
+	return block
 }
 
 func Handle(err error) {
 	if err != nil {
-		log.Fatal(err)
+		fmt.Errorf("%w", err)
 	}
 }

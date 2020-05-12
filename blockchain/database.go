@@ -1,10 +1,6 @@
 package blockchain
 
-import (
-	"fmt"
-
-	"github.com/syndtr/goleveldb/leveldb"
-)
+import "github.com/syndtr/goleveldb/leveldb"
 
 const dbPath = "./tmp/level"
 
@@ -12,7 +8,7 @@ var DB *leveldb.DB
 
 func OpenDatabase() {
 	db, err := leveldb.OpenFile(dbPath, nil)
-	
+
 	Handle(err)
 
 	DB = db
@@ -27,7 +23,7 @@ func RetrieveBlockchain() []*Block {
 		value := Deserialize(iter.Value())
 		tempBlockchain = append(tempBlockchain, value)
 	}
-	
+
 	iter.Release()
 	err := iter.Error()
 
@@ -54,8 +50,6 @@ func InsertStartingBlockchainIfNeeded() {
 	iter := DB.NewIterator(nil, nil)
 
 	canUseDB := iter.Next()
-
-	fmt.Println(canUseDB)
 
 	if canUseDB == false {
 		for _, block := range Chain.Blocks {
