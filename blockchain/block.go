@@ -4,14 +4,17 @@ type Block struct {
 	Hash	 string
 	Data	 string
 	PrevHash string
+	Nonce    int
 }
 
 func (block *Block) InsertHash() {
-	block.Hash = GetProvenHash(block)
+	hash, nonce := GetProvenHash(block)
+	block.Hash = hash
+	block.Nonce = nonce
 }
 
 func CreateBlock(data string, prevHash string) *Block {
-	block := &Block{"", data, prevHash}
+	block := &Block{"", data, prevHash, 0}
 	block.InsertHash()
 	return block
 }

@@ -1,9 +1,14 @@
 package blockchain
 
-import "github.com/syndtr/goleveldb/leveldb"
+import (
+	"strconv"
+
+	"github.com/syndtr/goleveldb/leveldb"
+)
 
 
 const dbPath = "./tmp/level"
+const lastHashStr = "lastHash"
 
 var DB *leveldb.DB
 
@@ -21,9 +26,12 @@ func RetrieveBlockchain() []Block {
 	iter := DB.NewIterator(nil, nil)
 
 	for iter.Next() {
-		value := Deserialize(iter.Value())
-		
-		tempBlockchain = append(tempBlockchain, *value)
+		_, err := strconv.Atoi(string(iter.Value()))
+		if err != nil {
+			value := *Deserialize(iter.Value())
+			tempBlockchain = append(tempBlockchain, value)
+		}
+		Handle(err)
 	}
 	iter.Release()
 	err := iter.Error()
@@ -43,7 +51,7 @@ func RetrieveBlock(hash string) *Block {
 
 func InsertBlock(block *Block) {
 	err := DB.Put([]byte(block.Hash), Serialize(block), nil)
-
+	DB.Put([]byte(lastHashStr), []byte(block.Hash), nil)
 	Handle(err)
 }
 
@@ -56,5 +64,7 @@ func InsertStartingBlockchainIfNeeded() {
 		for _, block := range Chain.Blocks {
 			DB.Put([]byte(block.Hash), Serialize(block), nil)
 		}
+		lastBlock := Chain.Blocks[len(Chain.Blocks)-1]
+		DB.Put([]byte(lastHashStr), []byte(lastBlock.Hash), nil)
 	}
 }

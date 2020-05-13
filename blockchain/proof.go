@@ -19,12 +19,12 @@ func getDataHash(data string) int {
 
 // GetProvenHash will return a hash out of the Block.Data, Block.PrevHash and a increasing counter until it matches the prove of work rule
 // the prove of work rule in this case is: lastHashDigits == 3
-func GetProvenHash(block *Block) string {
+func GetProvenHash(block *Block) (hash string, nonce int) {
 	var data string = block.Data + block.PrevHash
 	for i := 0; ; i++ {
 		hash := getDataHash(data + string(i))
 		if rule, stringHash := doesHashProvesWork(strconv.Itoa(hash)); rule {
-			return stringHash
+			return stringHash, i
 		}
 	}
 }
