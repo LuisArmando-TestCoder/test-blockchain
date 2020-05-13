@@ -8,8 +8,8 @@ func (chain *Blockchain) AddBlock(data string) *Block {
 	lastHash, err := DB.Get([]byte(lastHashStr), nil)
 	prevBlock := Chain.Blocks[len(Chain.Blocks)-1]
 
+	Handle(err)
 	if err == nil {
-		Handle(err)
 		prevBlock = RetrieveBlock(string(lastHash))
 	}
 	
